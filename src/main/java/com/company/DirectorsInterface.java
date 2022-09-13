@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
+
 public class DirectorsInterface {
 
     public static void main(String[] args) {
@@ -47,6 +48,7 @@ public class DirectorsInterface {
             sc.nextLine();
 
             System.out.println("-----------------------------------------");
+
             switch (option){
                 case 1:{
                     String className;
