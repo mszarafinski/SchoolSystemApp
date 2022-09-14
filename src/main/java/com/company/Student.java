@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.entity.SchoolClass;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;

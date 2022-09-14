@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.entity.SchoolClass;
+import com.company.service.SchoolClassService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,7 @@ import java.util.Scanner;
 public class SchoolSysInterface {
 
     @Bean
-    CommandLineRunner commandLineRunner() {
+    CommandLineRunner commandLineRunner(SchoolClassService schoolClassService) {
         return args -> {
             School school = new School("COPERNICUS PRIMARY SCHOOL");
             Scanner sc = new Scanner(System.in);
@@ -25,16 +27,15 @@ public class SchoolSysInterface {
                 System.out.println("<MENU> \tWhat action you would like to take ?");
                 System.out.println("\t\t1. Add a new class");
                 System.out.println("\t\t2. Add a new student");
-                System.out.println("\t\t3. Add a grade");
-                System.out.println("\t\t4. Move a student to another class");
-                System.out.println("\t\t5. Show all classes and a number of students");
-                System.out.println("\t\t6. Show all students");
-                System.out.println("\t\t7. Show all grades for a particular student");
-                System.out.println("\t\t8. Show grades in chosen period of time for a particular student");
-                System.out.println("\t\t9. Show particular student averages");
-                System.out.println("\t\t10. Show a students ranking");
-                System.out.println("\t\t11. Remove a student");
-
+//                System.out.println("\t\t3. Add a grade");
+//                System.out.println("\t\t4. Move a student to another class");
+//                System.out.println("\t\t5. Show all classes and a number of students");
+//                System.out.println("\t\t6. Show all students");
+//                System.out.println("\t\t7. Show all grades for a particular student");
+//                System.out.println("\t\t8. Show grades in chosen period of time for a particular student");
+//                System.out.println("\t\t9. Show particular student averages");
+//                System.out.println("\t\t10. Show a students ranking");
+//                System.out.println("\t\t11. Remove a student");
                 System.out.print("\n<INPUT> Select an option >> ");
 
                 int option;
@@ -60,23 +61,26 @@ public class SchoolSysInterface {
                         do {
                             System.out.print("<INPUT> Enter a class name (or 0 to quit) >> ");
                             className = sc.nextLine().toUpperCase();
-                            if (school.checkIfClassExists(className)) {
+                            if (schoolClassService.checkIfClassExists(className) ) {
                                 System.out.println("<ERROR> The class name already exists.");
                             }
-                        } while (school.checkIfClassExists(className) && !className.equals(exitSymbol));
+                        } while (schoolClassService.checkIfClassExists(className) && !className.equals(exitSymbol));
 
                         if (className.equals(exitSymbol)) {
                             break;
                         }
 
-                        school.createNewClass(className);
-                        System.out.println("<OUTPUT> The class " + className + " has been created");
+                        SchoolClass schoolClass = new SchoolClass(className);
+
+                        schoolClassService.createNewClass(schoolClass);
+
+                        System.out.println("<OUTPUT> The class " + schoolClass.getClassName() + " has been created");
                         break;
                     }
 
                     case 2: {
 
-                        if (school.getClasses().isEmpty()) {
+                        if (schoolClassService.checkIfNoClasses()) {
                             System.out.println("<ERROR> No classes available in the school, create one before adding a new student.");
                             break;
                         }
@@ -133,235 +137,235 @@ public class SchoolSysInterface {
                         break;
 
                     }
-
-                    case 3: {
-
-                        if (school.getSortedStudentsList().isEmpty()) {
-                            System.out.println("<ERROR> No students available in the school, create one before adding a new grade.");
-                            break;
-                        }
-
-                        System.out.println("<INPUT> Choose a student to add a grade. Available students are: ");
-                        school.showAllTheStudents();
-
-                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                        int userInputStudent = sc.nextInt();
-                        if (userInputStudent == 0) {
-                            break;
-                        }
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + "has been selected");
-
-                        System.out.println("<OUTPUT> SUBJECTS:");
-                        selectedStudent.printSubjects();
-                        System.out.println("<INPUT> Select a subject that you want to add a grade to (or 0 to quit) >> ");
-                        int userInputSubject = sc.nextInt();
-                        if (userInputSubject == 0) {
-                            break;
-                        }
-
-                        for (int i = 0; i < selectedStudent.getSubjects().length; i++) {
-                            if (selectedStudent.getSubjects()[i].ordinal() == userInputSubject - 1) {
-                                Grade grade = selectedStudent.addGrade(selectedStudent.getSubjects()[i]);
-                                System.out.printf("<OUTPUT> Grade (%d) has been added to %s for %s %s on  \n", userInputStudent, selectedStudent.getSubjects()[i].getName(), selectedStudent.getFirstName(), selectedStudent.getSecondName());
-                            }
-                        }
-                        break;
-                    }
-
-                    case 4: {
-
-                        if (school.getSortedStudentsList().isEmpty()) {
-                            System.out.println("<ERROR> No students available in the school, create one before adding a new grade.");
-                            break;
-                        } else if (school.getClasses().size() < 2) {
-                            System.out.println("<ERROR> There is less than 2 classes in the school.");
-                            break;
-                        }
-
-                        int userInputStudent;
-
-                        while (true) {
-                            System.out.println("<OUTPUT> Choose a student to be moved. Available students are: ");
-                            school.showAllTheStudents();
-
-                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                            userInputStudent = sc.nextInt();
-                            if (userInputStudent == 0) {
-                                continue;
-                            } else if (userInputStudent < 1 || userInputStudent > school.getSortedStudentsList().size()) {
-                                System.out.println("<ERROR> There is no such student. Select a value from 0 to " + school.getSortedStudentsList().size());
-                                continue;
-                            }
-                            break;
-                        }
-
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + "has been selected");
-
-                        System.out.println("<OUTPUT> Choose a class to move a student. Available classes (student number) are: ");
-                        school.showAllTheClassesAndStudentsNumber();
-                        String className;
-                        do {
-                            System.out.print("<INPUT> Enter a class name (or 0 to quit) >> ");
-                            className = sc.nextLine().toUpperCase();
-
-                            if (!school.checkIfClassExists(className)) {
-                                System.out.print("<ERROR> The class does not exist, try again: ");
-                            } else if (className.equals(selectedStudent.getaClass().getClassName())) {
-                                System.out.println("<ERROR> Cannot move student to the same class. Pleas pick another one.\n");
-                            }
-                        } while (!school.checkIfClassExists(className) || className.equals(selectedStudent.getaClass().getClassName()));
-
-                        if (className.equals(exitSymbol)) {
-                            break;
-                        }
-
-                        school.moveStudentToAnotherClass(selectedStudent, className);
-
-                        System.out.printf("<OUTPUT> The student " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " " + "has been moved to the " + className + " class.");
-                        break;
-                    }
-
-                    case 5: {
-
-                        if (school.getClasses().isEmpty()) {
-                            System.out.println("<OUTPUT> There are no classes or students in the school");
-                            break;
-                        }
-
-                        System.out.println("<OUTPUT> " + school.getName() + " classes & student number: ");
-                        school.showAllTheClassesAndStudentsNumber();
-                        break;
-                    }
-
-                    case 6: {
-
-                        if (school.getSortedStudentsList().isEmpty()) {
-                            System.out.println("<OUTPUT> There are no students in the school");
-                            break;
-                        }
-
-                        System.out.println("<OUTPUT> " + school.getName() + "'s students list:");
-                        school.showAllTheStudents();
-                        System.out.println();
-                        break;
-                    }
-
-                    case 7: {
-                        System.out.printf("<OUTPUT> List of the students");
-                        school.showAllTheStudents();
-                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                        int userInputStudent = sc.nextInt();
-
-                        if (userInputStudent == 0) {
-                            break;
-                        }
-
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-
-                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " grades are: ");
-                        selectedStudent.showStudentGrades();
-                        break;
-                    }
-
-                    case 8: {
-                        System.out.println("<OUTPUT> List of the students: ");
-                        school.showAllTheStudents();
-                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                        int userInputStudent = sc.nextInt();
-
-                        if (userInputStudent == 0) {
-                            break;
-                        }
-
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-
-                        LocalDate startingDate;
-                        LocalDate endingDate;
-
-                        do {
-                            System.out.print("<INPUT> Set starting date >> ");
-                            startingDate = selectedStudent.setGradeDate(sc);
-                            System.out.println();
-                            System.out.print("<INPUT> Set ending date >> ");
-                            endingDate = selectedStudent.setGradeDate(sc);
-
-                            if (startingDate.isAfter(endingDate)) {
-                                System.out.printf("<ERROR> Starting date cannot be a later date than ending date. Try again.");
-                            }
-                        } while (startingDate.isAfter(endingDate));
-
-                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " grades between " + startingDate.toString() + " and " + endingDate.toString() + " are: ");
-                        selectedStudent.showStudentGradesInTimePeriod(startingDate, endingDate);
-                        break;
-                    }
-
-                    case 9: {
-                        System.out.println("<OUTPUT> List of the students");
-                        school.showAllTheStudents();
-                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                        int userInputStudent = sc.nextInt();
-
-                        if (userInputStudent == 0) {
-                            break;
-                        }
-
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-
-                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " averages are: ");
-                        selectedStudent.showStudentAverages();
-                        break;
-                    }
-
-                    case 10: {
-
-                        List<Student> sortedStudents = school.sortStudentsByTotalAverage();
-
-                        System.out.println("<OUTPUT> Students ranking: ");
-
-                        for (int k = 0; k < sortedStudents.size(); k++) {
-
-                            Student currentStudent = sortedStudents.get(k);
-
-                            System.out.print("\t" + (k + 1) + ":\t");
-                            System.out.printf("\t%s %s (%.2f)\n", currentStudent.getFirstName(), currentStudent.getSecondName(), currentStudent.getTotalAverage());
-                        }
-
-                        break;
-                    }
-
-
-                    case 11: {
-                        if (school.getSortedStudentsList().isEmpty()) {
-                            System.out.println("<ERROR> No students available in the school.");
-                            break;
-                        }
-                        int userInputStudent;
-
-                        while (true) {
-                            System.out.println("<OUTPUT> Choose a student to be removed. Available students are: ");
-                            school.showAllTheStudents();
-
-                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-                            userInputStudent = sc.nextInt();
-                            if (userInputStudent == 0) {
-                                continue;
-                            } else if (userInputStudent < 1 || userInputStudent > school.getSortedStudentsList().size()) {
-                                System.out.println("<ERROR> There is no such student. Select a value from 0 to " + school.getSortedStudentsList().size());
-                                continue;
-                            }
-                            break;
-                        }
-
-                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-
-                        school.removeStudent(selectedStudent);
-                        System.out.printf("<OUTPUT> The student %s %s has been removed", selectedStudent.getFirstName(), selectedStudent.getSecondName());
-
-                        break;
-
-                    }
+//
+//                    case 3: {
+//
+//                        if (school.getSortedStudentsList().isEmpty()) {
+//                            System.out.println("<ERROR> No students available in the school, create one before adding a new grade.");
+//                            break;
+//                        }
+//
+//                        System.out.println("<INPUT> Choose a student to add a grade. Available students are: ");
+//                        school.showAllTheStudents();
+//
+//                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                        int userInputStudent = sc.nextInt();
+//                        if (userInputStudent == 0) {
+//                            break;
+//                        }
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + "has been selected");
+//
+//                        System.out.println("<OUTPUT> SUBJECTS:");
+//                        selectedStudent.printSubjects();
+//                        System.out.println("<INPUT> Select a subject that you want to add a grade to (or 0 to quit) >> ");
+//                        int userInputSubject = sc.nextInt();
+//                        if (userInputSubject == 0) {
+//                            break;
+//                        }
+//
+//                        for (int i = 0; i < selectedStudent.getSubjects().length; i++) {
+//                            if (selectedStudent.getSubjects()[i].ordinal() == userInputSubject - 1) {
+//                                Grade grade = selectedStudent.addGrade(selectedStudent.getSubjects()[i]);
+//                                System.out.printf("<OUTPUT> Grade (%d) has been added to %s for %s %s on  \n", userInputStudent, selectedStudent.getSubjects()[i].getName(), selectedStudent.getFirstName(), selectedStudent.getSecondName());
+//                            }
+//                        }
+//                        break;
+//                    }
+//
+//                    case 4: {
+//
+//                        if (school.getSortedStudentsList().isEmpty()) {
+//                            System.out.println("<ERROR> No students available in the school, create one before adding a new grade.");
+//                            break;
+//                        } else if (school.getClasses().size() < 2) {
+//                            System.out.println("<ERROR> There is less than 2 classes in the school.");
+//                            break;
+//                        }
+//
+//                        int userInputStudent;
+//
+//                        while (true) {
+//                            System.out.println("<OUTPUT> Choose a student to be moved. Available students are: ");
+//                            school.showAllTheStudents();
+//
+//                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                            userInputStudent = sc.nextInt();
+//                            if (userInputStudent == 0) {
+//                                continue;
+//                            } else if (userInputStudent < 1 || userInputStudent > school.getSortedStudentsList().size()) {
+//                                System.out.println("<ERROR> There is no such student. Select a value from 0 to " + school.getSortedStudentsList().size());
+//                                continue;
+//                            }
+//                            break;
+//                        }
+//
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + "has been selected");
+//
+//                        System.out.println("<OUTPUT> Choose a class to move a student. Available classes (student number) are: ");
+//                        school.showAllTheClassesAndStudentsNumber();
+//                        String className;
+//                        do {
+//                            System.out.print("<INPUT> Enter a class name (or 0 to quit) >> ");
+//                            className = sc.nextLine().toUpperCase();
+//
+//                            if (!school.checkIfClassExists(className)) {
+//                                System.out.print("<ERROR> The class does not exist, try again: ");
+//                            } else if (className.equals(selectedStudent.getaClass().getClassName())) {
+//                                System.out.println("<ERROR> Cannot move student to the same class. Pleas pick another one.\n");
+//                            }
+//                        } while (!school.checkIfClassExists(className) || className.equals(selectedStudent.getaClass().getClassName()));
+//
+//                        if (className.equals(exitSymbol)) {
+//                            break;
+//                        }
+//
+//                        school.moveStudentToAnotherClass(selectedStudent, className);
+//
+//                        System.out.printf("<OUTPUT> The student " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " " + "has been moved to the " + className + " class.");
+//                        break;
+//                    }
+//
+//                    case 5: {
+//
+//                        if (school.getClasses().isEmpty()) {
+//                            System.out.println("<OUTPUT> There are no classes or students in the school");
+//                            break;
+//                        }
+//
+//                        System.out.println("<OUTPUT> " + school.getName() + " classes & student number: ");
+//                        school.showAllTheClassesAndStudentsNumber();
+//                        break;
+//                    }
+//
+//                    case 6: {
+//
+//                        if (school.getSortedStudentsList().isEmpty()) {
+//                            System.out.println("<OUTPUT> There are no students in the school");
+//                            break;
+//                        }
+//
+//                        System.out.println("<OUTPUT> " + school.getName() + "'s students list:");
+//                        school.showAllTheStudents();
+//                        System.out.println();
+//                        break;
+//                    }
+//
+//                    case 7: {
+//                        System.out.printf("<OUTPUT> List of the students");
+//                        school.showAllTheStudents();
+//                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                        int userInputStudent = sc.nextInt();
+//
+//                        if (userInputStudent == 0) {
+//                            break;
+//                        }
+//
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//
+//                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " grades are: ");
+//                        selectedStudent.showStudentGrades();
+//                        break;
+//                    }
+//
+//                    case 8: {
+//                        System.out.println("<OUTPUT> List of the students: ");
+//                        school.showAllTheStudents();
+//                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                        int userInputStudent = sc.nextInt();
+//
+//                        if (userInputStudent == 0) {
+//                            break;
+//                        }
+//
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//
+//                        LocalDate startingDate;
+//                        LocalDate endingDate;
+//
+//                        do {
+//                            System.out.print("<INPUT> Set starting date >> ");
+//                            startingDate = selectedStudent.setGradeDate(sc);
+//                            System.out.println();
+//                            System.out.print("<INPUT> Set ending date >> ");
+//                            endingDate = selectedStudent.setGradeDate(sc);
+//
+//                            if (startingDate.isAfter(endingDate)) {
+//                                System.out.printf("<ERROR> Starting date cannot be a later date than ending date. Try again.");
+//                            }
+//                        } while (startingDate.isAfter(endingDate));
+//
+//                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " grades between " + startingDate.toString() + " and " + endingDate.toString() + " are: ");
+//                        selectedStudent.showStudentGradesInTimePeriod(startingDate, endingDate);
+//                        break;
+//                    }
+//
+//                    case 9: {
+//                        System.out.println("<OUTPUT> List of the students");
+//                        school.showAllTheStudents();
+//                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                        int userInputStudent = sc.nextInt();
+//
+//                        if (userInputStudent == 0) {
+//                            break;
+//                        }
+//
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//
+//                        System.out.println("<OUTPUT> " + selectedStudent.getFirstName() + " " + selectedStudent.getSecondName() + " averages are: ");
+//                        selectedStudent.showStudentAverages();
+//                        break;
+//                    }
+//
+//                    case 10: {
+//
+//                        List<Student> sortedStudents = school.sortStudentsByTotalAverage();
+//
+//                        System.out.println("<OUTPUT> Students ranking: ");
+//
+//                        for (int k = 0; k < sortedStudents.size(); k++) {
+//
+//                            Student currentStudent = sortedStudents.get(k);
+//
+//                            System.out.print("\t" + (k + 1) + ":\t");
+//                            System.out.printf("\t%s %s (%.2f)\n", currentStudent.getFirstName(), currentStudent.getSecondName(), currentStudent.getTotalAverage());
+//                        }
+//
+//                        break;
+//                    }
+//
+//
+//                    case 11: {
+//                        if (school.getSortedStudentsList().isEmpty()) {
+//                            System.out.println("<ERROR> No students available in the school.");
+//                            break;
+//                        }
+//                        int userInputStudent;
+//
+//                        while (true) {
+//                            System.out.println("<OUTPUT> Choose a student to be removed. Available students are: ");
+//                            school.showAllTheStudents();
+//
+//                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+//                            userInputStudent = sc.nextInt();
+//                            if (userInputStudent == 0) {
+//                                continue;
+//                            } else if (userInputStudent < 1 || userInputStudent > school.getSortedStudentsList().size()) {
+//                                System.out.println("<ERROR> There is no such student. Select a value from 0 to " + school.getSortedStudentsList().size());
+//                                continue;
+//                            }
+//                            break;
+//                        }
+//
+//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
+//
+//                        school.removeStudent(selectedStudent);
+//                        System.out.printf("<OUTPUT> The student %s %s has been removed", selectedStudent.getFirstName(), selectedStudent.getSecondName());
+//
+//                        break;
+//
+//                    }
 
 
                     default: {

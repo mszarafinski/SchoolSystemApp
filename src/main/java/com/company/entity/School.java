@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.entity.SchoolClass;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,9 +29,6 @@ public class School {
         return this.name;
     }
 
-    public void createNewClass(String className){
-        classes.add(new SchoolClass(className));
-    }
 
     public Student createNewStudent(String firstName, String secondName){
         Student student = new Student(firstName,secondName);
@@ -56,7 +55,7 @@ public class School {
         } else {
             for (SchoolClass aClass : classes) {
                 System.out.print("\t\t"+aClass.getClassName() + ": \t");
-                System.out.println(aClass.getStudentsList().size());
+//                System.out.println(aClass.getStudentsList().size());
             }
         }
     }
@@ -83,7 +82,7 @@ public class School {
 
         for (SchoolClass aClass : classes) {
             if(aClass.getClassName().equals(className)){
-                aClass.getStudentsList().add(student);
+//                aClass.getStudentsList().add(student);
                 student.setaClass(aClass);
             }
         }
@@ -114,7 +113,7 @@ public class School {
 
             if(aClass.getClassName().equals(className)){
                 aclass = aClass;
-                student.getaClass().getStudentsList().remove(student);
+//                student.getaClass().getStudentsList().remove(student);
                 student.setaClass(aclass);
                 break;
             }
@@ -126,7 +125,7 @@ public class School {
         for (Student aStudent : this.getSortedStudentsList()) {
             if(aStudent.equals(student)){
                 this.students.remove(aStudent);
-                aStudent.getaClass().getStudentsList().remove(aStudent);
+//                aStudent.getaClass().getStudentsList().remove(aStudent);
             }
         }
     }
