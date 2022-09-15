@@ -1,32 +1,34 @@
 package com.company;
 
 import com.company.entity.SchoolClass;
+import com.company.entity.Student;
 import com.company.service.SchoolClassService;
+import com.company.service.StudentService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 @Component
 public class SchoolSysInterface {
 
     @Bean
-    CommandLineRunner commandLineRunner(SchoolClassService schoolClassService) {
+    CommandLineRunner commandLineRunner(SchoolClassService schoolClassService, StudentService studentService) {
         return args -> {
             School school = new School("COPERNICUS PRIMARY SCHOOL");
             Scanner sc = new Scanner(System.in);
 
             System.out.printf("\n\t\tWELCOME TO THE %s SYSTEM\n\n", school.getName());
 
+
+
             while (true) {
                 System.out.println("<MENU> \tWhat action you would like to take ?");
                 System.out.println("\t\t1. Add a new class");
                 System.out.println("\t\t2. Add a new student");
+                System.out.println("\t\t3. Remove a new student");
+
 //                System.out.println("\t\t3. Add a grade");
 //                System.out.println("\t\t4. Move a student to another class");
 //                System.out.println("\t\t5. Show all classes and a number of students");
@@ -86,54 +88,99 @@ public class SchoolSysInterface {
                         }
 
                         String studentFirstName;
-                        String studentSecondName = null;
+                        String studentLastName;
 
-                        do {
+//                        do {
                             System.out.print("<INPUT> Enter student first name (or 0 to quit) >> ");
                             studentFirstName = sc.nextLine();
 
-                            if (studentFirstName.equals(exitSymbol)) {
-                                break;
-                            }
+//                            if (studentFirstName.equals(exitSymbol)) {
+//                                break;
+//                            }
                             System.out.print("<INPUT> Enter student second name (or 0 to quit) >> ");
-                            studentSecondName = sc.nextLine();
+                            studentLastName = sc.nextLine();
 
-                            if (studentSecondName.equals(exitSymbol)) {
-                                break;
-                            }
+//                            if (studentLastName.equals(exitSymbol)) {
+//                                break;
+//                            }
 
-                            if (school.checkIfStudentExists(studentFirstName, studentSecondName)) {
-                                System.out.println("<ERROR> The student already exists. Try again.");
-                            }
+//                            if (school.checkIfStudentExists(studentFirstName, studentLastName)) {
+//                                System.out.println("<ERROR> The student already exists. Try again.");
+//                            }
 
-                        } while (school.checkIfStudentExists(studentFirstName, studentSecondName));
+//                        } while (school.checkIfStudentExists(studentFirstName, studentLastName));
 
                         if (studentFirstName.equals(exitSymbol)) {
                             break;
-                        } else if (studentSecondName == null || !studentSecondName.equals(exitSymbol)) {
-
-                            Student newStudent = school.createNewStudent(studentFirstName, studentSecondName);
+                        } else if (!studentLastName.equals(exitSymbol)) {
 
                             System.out.println("<OUTPUT> Available classes are: ");
-                            school.showAllTheClassesAndStudentsNumber();
+                            schoolClassService.showAllClassesAsNames();
                             String className;
                             System.out.print("<INPUT> Enter a class name to assign the student (or 0 to quit) >> ");
                             do {
                                 className = sc.nextLine().toUpperCase(Locale.ENGLISH);
 
-                                if (!school.checkIfClassExists(className)) {
+                                if (!schoolClassService.checkIfClassExists(className)) {
                                     System.out.print("<ERROR> The class does not exist. Try again. ");
                                 }
-                            } while (!school.checkIfClassExists(className));
+                            } while (!schoolClassService.checkIfClassExists(className));
 
                             if (className.equals(exitSymbol)) {
                                 break;
                             }
 
-                            school.assignStudentToClass(newStudent, className);
-                            System.out.printf("<OUTPUT> The student %s %s has been assigned to the class %s\n", studentFirstName, studentSecondName, className);
+                            SchoolClass schoolClass = schoolClassService.findByClassName(className);
+
+                            Student student = new Student(studentFirstName,studentLastName);
+                            schoolClass.addStudent(student);
+
+                            studentService.createNewStudent(student);
+                            schoolClassService.addNewStudentToClass(student,schoolClass);
+
+                            System.out.printf("<OUTPUT> The student %s %s has been assigned to the class %s\n", studentFirstName, studentLastName, className);
                             break;
                         }
+                        break;
+
+                    }
+
+                    case 3: {
+
+                        List<Student> students = studentService.getSortedStudentsList();
+
+                        if (students.isEmpty()) {
+                            System.out.println("<ERROR> No students available in the school.");
+                            break;
+                        }
+                        long userInputStudent;
+
+                        while (true) {
+                            System.out.println("<OUTPUT> Choose a student to be removed. Available students are: ");
+                            studentService.printStudentList(students);
+
+                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
+                            userInputStudent = sc.nextInt();
+                            if (userInputStudent == 0) {
+                                continue;
+                            }
+                            break;
+                        }
+
+                        Optional<Student> studentOptional = studentService.findStudentById(userInputStudent - 1);
+                        Student student;
+
+                        if(studentOptional.isPresent()){
+                            student = studentOptional.get();
+                        } else {
+                            System.out.println("<ERROR> Student does not exists, pick another one with a correct id number." );
+                            break;
+                        }
+
+
+                        studentService.deleteStudent(student);
+                        System.out.printf("<OUTPUT> The student %s %s has been removed", student.getFirstName(), student.getLastName());
+
                         break;
 
                     }
@@ -336,36 +383,7 @@ public class SchoolSysInterface {
 //                    }
 //
 //
-//                    case 11: {
-//                        if (school.getSortedStudentsList().isEmpty()) {
-//                            System.out.println("<ERROR> No students available in the school.");
-//                            break;
-//                        }
-//                        int userInputStudent;
 //
-//                        while (true) {
-//                            System.out.println("<OUTPUT> Choose a student to be removed. Available students are: ");
-//                            school.showAllTheStudents();
-//
-//                            System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
-//                            userInputStudent = sc.nextInt();
-//                            if (userInputStudent == 0) {
-//                                continue;
-//                            } else if (userInputStudent < 1 || userInputStudent > school.getSortedStudentsList().size()) {
-//                                System.out.println("<ERROR> There is no such student. Select a value from 0 to " + school.getSortedStudentsList().size());
-//                                continue;
-//                            }
-//                            break;
-//                        }
-//
-//                        Student selectedStudent = school.getSortedStudentsList().get(userInputStudent - 1);
-//
-//                        school.removeStudent(selectedStudent);
-//                        System.out.printf("<OUTPUT> The student %s %s has been removed", selectedStudent.getFirstName(), selectedStudent.getSecondName());
-//
-//                        break;
-//
-//                    }
 
 
                     default: {

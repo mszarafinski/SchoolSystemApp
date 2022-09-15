@@ -1,21 +1,18 @@
 package com.company.entity;
 
-import com.company.Student;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
 
 @Entity(name = "Class")
-@Table(name = "class",
-        uniqueConstraints = @UniqueConstraint(name = "claas_name_unique", columnNames = "class_name"))
-
+@Table(
+        name = "class",
+        uniqueConstraints = @UniqueConstraint(name = "class_name_unique", columnNames = "class_name")
+)
 public class SchoolClass {
 
     @Id
@@ -42,7 +39,11 @@ public class SchoolClass {
     )
     private String className;
 
-    //    private List<Student> studentsList;
+    //    @JsonIgnore
+    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Student> students = new HashSet<>();
+
+
 //    Scanner sc = new Scanner(System.in);
 
     public SchoolClass() {
@@ -60,12 +61,24 @@ public class SchoolClass {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getClassName() {
         return className;
     }
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public Set<Student> getStudents() {
+        return students;
+    }
+
+    public void addStudent(Student student){
+        if(!this.students.contains(student)){
+            this.students.add(student);
+            student.setSchoolClass(this);
+        }
     }
 
     @Override
