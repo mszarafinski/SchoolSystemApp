@@ -12,7 +12,7 @@ import java.util.*;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "Student")
-//@Table(name = "student")
+@Table(name = "student")
 public class Student {
 
     @Id
@@ -48,8 +48,8 @@ public class Student {
     @JoinColumn(
             name = "class_id",
             referencedColumnName = "id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "student_class_name_fk")
+            foreignKey = @ForeignKey(name = "student_class_name_fk"),
+            nullable = true
     )
     private SchoolClass schoolClass;
 
@@ -60,6 +60,10 @@ public class Student {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
+
+
+
 
     //    private Map<Subject, ArrayList> gradeBook;
 //    private Subject [] subjects = Subject.values();
@@ -110,6 +114,8 @@ public class Student {
     public void setSchoolClass(SchoolClass schoolClass) {
         this.schoolClass = schoolClass;
     }
+
+
 
 
 

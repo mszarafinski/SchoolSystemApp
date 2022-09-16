@@ -57,4 +57,11 @@ public class SchoolClassService {
         return schoolClassRepository.findByClassName(className);
     }
 
+
+    public long getNumberOfClasses(){
+       return  schoolClassRepository.count();
+    }
+
+
+
 }

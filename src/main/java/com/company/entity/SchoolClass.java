@@ -1,6 +1,8 @@
 package com.company.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -40,18 +42,14 @@ public class SchoolClass {
     private String className;
 
     //    @JsonIgnore
-    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Student> students = new HashSet<>();
-
-
-//    Scanner sc = new Scanner(System.in);
+    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER)
+    private List<Student> students = new ArrayList<>();
 
     public SchoolClass() {
     }
 
     public SchoolClass(String className) {
         this.className = className.toUpperCase(Locale.ENGLISH);
-//        this.studentsList = new ArrayList<Student>();
     }
 
     public Long getId() {
@@ -70,14 +68,25 @@ public class SchoolClass {
         this.className = className;
     }
 
-    public Set<Student> getStudents() {
+    public List<Student> getStudents() {
         return students;
     }
 
-    public void addStudent(Student student){
-        if(!this.students.contains(student)){
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+    public void addStudent(Student student) {
+        if (!this.students.contains(student)) {
             this.students.add(student);
             student.setSchoolClass(this);
+        }
+    }
+
+    public void deleteStudent(Student student) {
+        if (this.students.contains(student)) {
+            student.setSchoolClass(null);
+            this.students.remove(student);
         }
     }
 
@@ -88,13 +97,5 @@ public class SchoolClass {
                 ", className='" + className + '\'' +
                 '}';
     }
-
-    //    public List<Student> getStudentsList() {
-//        return studentsList;
-//    }
-
-//    public void addStudentToClass(Student student){
-//        this.studentsList.add(student);
-//    }
 
 }

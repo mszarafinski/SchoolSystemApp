@@ -106,20 +106,7 @@ public class School {
 //                .collect(Collectors.toCollection(ArrayList::new));
 //    }
 
-//    public void moveStudentToAnotherClass(Student student, String className){
-//
-//        SchoolClass aclass = student.getSchoolClass();
-//
-//        for (SchoolClass aClass : this.classes) {
-//
-//            if(aClass.getClassName().equals(className)){
-//                aclass = aClass;
-////                student.getaClass().getStudentsList().remove(student);
-//                student.setSchoolClass(aclass);
-//                break;
-//            }
-//        }
-//    }
+
 
 //    public void removeStudent(Student student){
 //
