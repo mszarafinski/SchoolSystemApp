@@ -1,13 +1,8 @@
 package com.company.entity;
 
-import com.company.Grade;
-import com.company.Subject;
-
 import javax.persistence.*;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.*;
+
+import java.util.List;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -53,6 +48,13 @@ public class Student {
     )
     private SchoolClass schoolClass;
 
+    @OneToMany(
+            mappedBy = "student",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private List<Grade> grades;
+
     public Student() {
     }
 
@@ -60,28 +62,6 @@ public class Student {
         this.firstName = firstName;
         this.lastName = lastName;
     }
-
-
-
-
-
-    //    private Map<Subject, ArrayList> gradeBook;
-//    private Subject [] subjects = Subject.values();
-//    private List<Double> averages;
-
-//    Scanner sc = new Scanner(System.in);
-
-//    public Student(String firstName, String lastName) {
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//
-////        gradeBook = new TreeMap<Subject, ArrayList>();
-//
-////        for (Subject subject : subjects) {
-////            gradeBook.put(subject, new ArrayList<Grade>());
-////        }
-//    }
-
 
     public Long getId() {
         return id;
@@ -115,12 +95,15 @@ public class Student {
         this.schoolClass = schoolClass;
     }
 
+    public List<Grade> getGrades() {
+        return grades;
+    }
 
+    public void setGrades(List<Grade> grades) {
+        this.grades = grades;
+    }
 
-
-
-
-//    public void showStudentGradesForTheGivenSubject(Subject subject){
+    //    public void showStudentGradesForTheGivenSubject(Subject subject){
 //        List <Grade> gradeList = this.gradeBook.get(subject);
 //        if(gradeList.isEmpty()){
 //            System.out.print("\tNo grades yet");

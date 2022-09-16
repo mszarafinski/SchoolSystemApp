@@ -1,6 +1,6 @@
 package com.company;
 
-public enum Subject {
+public enum SubjectName {
 
     MATHEMATICS("Math"),
     BIOLOGY("Bio"),
@@ -12,7 +12,7 @@ public enum Subject {
 
     private final String name;
 
-    private Subject(String name){
+    private SubjectName(String name){
         this.name = name;
     }
 

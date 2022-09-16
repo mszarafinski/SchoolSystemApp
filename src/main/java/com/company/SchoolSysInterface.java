@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.entity.Grade;
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
 import com.company.service.SchoolClassService;
@@ -27,8 +28,9 @@ public class SchoolSysInterface {
                 System.out.println("\t\t2. Add a new student");
                 System.out.println("\t\t3. Remove a student");
                 System.out.println("\t\t4. Move a student to another class");
+                System.out.println("\t\t5. Add a grade");
 
-//                System.out.println("\t\t3. Add a grade");
+
 //                System.out.println("\t\t5. Show all classes and a number of students");
 //                System.out.println("\t\t6. Show all students");
 //                System.out.println("\t\t7. Show all grades for a particular student");
@@ -261,16 +263,18 @@ public class SchoolSysInterface {
                         System.out.printf("<OUTPUT> The student " + student.getFirstName() + " " + student.getLastName() + " " + " has been moved to the " + className + " class.\n");
                         break;
                     }
+
+//                    case 5: {
 //
-//                    case 3: {
+//                        List<Student> students = studentService.getSortedStudentsList();
+//                        Student student;
 //
-//                        if (school.getSortedStudentsList().isEmpty()) {
-//                            System.out.println("<ERROR> No students available in the school, create one before adding a new grade.");
+//                        if (students.isEmpty()) {
+//                            System.out.println("<ERROR> No students available in the school.");
 //                            break;
-//                        }
 //
 //                        System.out.println("<INPUT> Choose a student to add a grade. Available students are: ");
-//                        school.showAllTheStudents();
+//                        studentService.showStudentList(students);
 //
 //                        System.out.print("<INPUT> Select a student (or 0 to quit) >> ");
 //                        int userInputStudent = sc.nextInt();
