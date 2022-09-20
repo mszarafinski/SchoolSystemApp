@@ -11,13 +11,17 @@ import java.util.Scanner;
 
 @Service
 public class SchoolClassService {
-
     private SchoolClassRepository schoolClassRepository;
+
     private Scanner sc;
 
     @Autowired
     public SchoolClassService(SchoolClassRepository schoolClassRepository) {
         this.schoolClassRepository = schoolClassRepository;
+    }
+
+    public List<SchoolClass> getAllClasses() {
+        return schoolClassRepository.findAll();
     }
 
     public void createNewClass(SchoolClass schoolClass){
@@ -43,16 +47,16 @@ public class SchoolClassService {
     public void showAllClassesAsNames(){
         showAllClassesAsObjects().stream().forEach(schoolClass -> System.out.println(schoolClass.getClassName()));
     }
-
 //    @Transactional
 //    public void addNewStudentToClass(Student student, SchoolClass schoolClass){
 //        if(!schoolClass.getStudents().contains(student)){
 //            schoolClass.getStudents().add(student);
 //            student.setSchoolClass(schoolClass);
 //        }
-//    }
 
+//    }
 //    @Transactional
+
     public SchoolClass findByClassName (String className){
         return schoolClassRepository.findByClassName(className);
     }
@@ -61,7 +65,5 @@ public class SchoolClassService {
     public long getNumberOfClasses(){
        return  schoolClassRepository.count();
     }
-
-
 
 }
