@@ -114,6 +114,10 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
+    public Student findbyLastName(String lastName){
+        return studentRepository.findByLastName(lastName);
+    }
+
 
 
 
