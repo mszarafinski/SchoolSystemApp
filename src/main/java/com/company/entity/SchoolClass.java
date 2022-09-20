@@ -12,7 +12,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "Class")
 @Table(
-        name = "class",
+        name = "classes",
         uniqueConstraints = @UniqueConstraint(name = "class_name_unique", columnNames = "class_name")
 )
 public class SchoolClass {
@@ -65,7 +65,7 @@ public class SchoolClass {
     }
 
     public void setClassName(String className) {
-        this.className = className;
+        this.className = className.toUpperCase();
     }
 
 //    public List<Student> getStudents() {

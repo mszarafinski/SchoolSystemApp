@@ -1,6 +1,8 @@
 package com.company.service;
 
+import com.company.entity.SchoolClass;
 import com.company.entity.Student;
+import com.company.repository.SchoolClassRepository;
 import com.company.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -14,11 +16,13 @@ import java.util.Optional;
 public class StudentService {
 
     private StudentRepository studentRepository;
+    private SchoolClassService schoolClassService;
 
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, SchoolClassService schoolClassService) {
         this.studentRepository = studentRepository;
+        this.schoolClassService = schoolClassService;
     }
+
 
     public boolean checkIfStudentExistsByName(String firstName, String lastName) {
         return studentRepository.existsByFirstNameAndLastName(firstName, lastName);
@@ -31,6 +35,36 @@ public class StudentService {
     public void addNewStudent(Student student) {
         studentRepository.save(student);
     }
+
+    public void addNewStudent(Student student, Long classId) {
+        SchoolClass schoolClass = schoolClassService.findById(classId);
+        student.setSchoolClass(schoolClass);
+        studentRepository.save(student);
+    }
+
+    public void changeStudentClass(Long studentId, Long classId) {
+        SchoolClass newSchoolClass = schoolClassService.findById(classId);
+        Student student = findById(studentId);
+
+        if(student.getSchoolClass().getId() == classId){
+            throw new IllegalArgumentException("The student is already assigned to the " + newSchoolClass.getClassName() + " class");
+        }
+
+        student.setSchoolClass(newSchoolClass);
+
+        studentRepository.save(student);
+    }
+
+    private Student findById(Long studentId) {
+        Optional<Student> studentOptional = studentRepository.findById(studentId);
+
+        if (studentOptional.isPresent()) {
+            return studentOptional.get();
+        }else {
+            throw new NullPointerException("Student does not exist");
+        }
+    }
+
 
     public boolean checkIfStudentExistsById(Long id) {
         return studentRepository.existsById(id);
@@ -79,6 +113,13 @@ public class StudentService {
     public void deleteStudentById(Long id) {
         studentRepository.deleteById(id);
     }
+
+
+
+
+
+
+
 
 //    public void changeStudentClass(Student student, SchoolClass newClass){
 //        student.setSchoolClass(newClass);

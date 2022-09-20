@@ -7,7 +7,7 @@ import java.util.List;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "Student")
-@Table(name = "student")
+@Table(name = "students")
 public class Student {
 
     @Id
@@ -39,14 +39,14 @@ public class Student {
     )
     private String lastName;
 
-//    @ManyToOne
-//    @JoinColumn(
-//            name = "class_id",
-//            referencedColumnName = "id",
-//            foreignKey = @ForeignKey(name = "student_class_name_fk"),
-//            nullable = true
-//    )
-//    private SchoolClass schoolClass;
+    @ManyToOne
+    @JoinColumn(
+            name = "class_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "student_class_name_fk"),
+            nullable = true
+    )
+    private SchoolClass schoolClass;
 
 //    @OneToMany(
 //            mappedBy = "student",
@@ -87,13 +87,13 @@ public class Student {
         this.lastName = lastName;
     }
 
-//    public SchoolClass getSchoolClass() {
-//        return schoolClass;
-//    }
-//
-//    public void setSchoolClass(SchoolClass schoolClass) {
-//        this.schoolClass = schoolClass;
-//    }
+    public SchoolClass getSchoolClass() {
+        return schoolClass;
+    }
+
+    public void setSchoolClass(SchoolClass schoolClass) {
+        this.schoolClass = schoolClass;
+    }
 
 //    public List<Grade> getGrades() {
 //        return grades;

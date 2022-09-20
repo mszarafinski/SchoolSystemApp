@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @Service
 public class SchoolClassService {
     private SchoolClassRepository schoolClassRepository;
 
-    private Scanner sc;
 
     @Autowired
     public SchoolClassService(SchoolClassRepository schoolClassRepository) {
@@ -24,27 +24,36 @@ public class SchoolClassService {
         return schoolClassRepository.findAll();
     }
 
-    public void createNewClass(SchoolClass schoolClass){
+    public void createNewClass(SchoolClass schoolClass) {
         this.schoolClassRepository.save(schoolClass);
     }
 
+    public SchoolClass findById(Long id) {
+        Optional<SchoolClass> classOptional = schoolClassRepository.findById(id);
 
-    public boolean checkIfClassExists(String className){
+        if (classOptional.isPresent()) {
+            return classOptional.get();
+        }else {
+            throw new NullPointerException("Class does not exist");
+        }
+    }
+
+    public boolean checkIfClassExists(String className) {
         return schoolClassRepository.existsByClassName(className);
     }
 
-    public boolean checkIfNoClasses(){
-        if(schoolClassRepository.count() == 0){
+    public boolean checkIfNoClasses() {
+        if (schoolClassRepository.count() == 0) {
             return true;
         }
         return false;
     }
 
-    public List<SchoolClass> showAllClassesAsObjects(){
+    public List<SchoolClass> showAllClassesAsObjects() {
         return schoolClassRepository.findAll();
     }
 
-    public void showAllClassesAsNames(){
+    public void showAllClassesAsNames() {
         showAllClassesAsObjects().stream().forEach(schoolClass -> System.out.println(schoolClass.getClassName()));
     }
 //    @Transactional
@@ -57,13 +66,13 @@ public class SchoolClassService {
 //    }
 //    @Transactional
 
-    public SchoolClass findByClassName (String className){
+    public SchoolClass findByClassName(String className) {
         return schoolClassRepository.findByClassName(className);
     }
 
 
-    public long getNumberOfClasses(){
-       return  schoolClassRepository.count();
+    public long getNumberOfClasses() {
+        return schoolClassRepository.count();
     }
 
 }

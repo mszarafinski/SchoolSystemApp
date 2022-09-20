@@ -16,16 +16,31 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-
     @GetMapping(path = "/all")
     public List<Student> getAllStudents(){
         return studentService.getAllStudents();
     }
 
-    @PostMapping
+    @PostMapping(path = "/add")
     public void addNewStudent(@RequestBody Student student){
         studentService.addNewStudent(student);
     }
+
+    @PostMapping(path = "/add", params = "classId")
+    public void addNewStudent(@RequestBody Student student, @RequestParam(name = "classId") Long id){
+         studentService.addNewStudent(student,id);
+    }
+
+    @PutMapping(path = "/update/{studentId}", params = "classId")
+    public void changeStudentClass(
+            @PathVariable(name = "studentId") Long studentId,
+            @RequestParam(name = "classId") Long classId
+    ){
+        studentService.changeStudentClass(studentId,classId);
+    }
+
+
+
 
 
 
