@@ -45,12 +45,12 @@ public class SchoolClassService {
     }
 
 //    @Transactional
-    public void addNewStudentToClass(Student student, SchoolClass schoolClass){
-        if(!schoolClass.getStudents().contains(student)){
-            schoolClass.getStudents().add(student);
-            student.setSchoolClass(schoolClass);
-        }
-    }
+//    public void addNewStudentToClass(Student student, SchoolClass schoolClass){
+//        if(!schoolClass.getStudents().contains(student)){
+//            schoolClass.getStudents().add(student);
+//            student.setSchoolClass(schoolClass);
+//        }
+//    }
 
 //    @Transactional
     public SchoolClass findByClassName (String className){

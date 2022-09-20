@@ -39,21 +39,21 @@ public class Student {
     )
     private String lastName;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "class_id",
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "student_class_name_fk"),
-            nullable = true
-    )
-    private SchoolClass schoolClass;
+//    @ManyToOne
+//    @JoinColumn(
+//            name = "class_id",
+//            referencedColumnName = "id",
+//            foreignKey = @ForeignKey(name = "student_class_name_fk"),
+//            nullable = true
+//    )
+//    private SchoolClass schoolClass;
 
-    @OneToMany(
-            mappedBy = "student",
-            fetch = FetchType.EAGER,
-            orphanRemoval = true,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private List<Grade> grades;
+//    @OneToMany(
+//            mappedBy = "student",
+//            fetch = FetchType.EAGER,
+//            orphanRemoval = true,
+//            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+//    private List<Grade> grades;
 
     public Student() {
     }
@@ -87,21 +87,21 @@ public class Student {
         this.lastName = lastName;
     }
 
-    public SchoolClass getSchoolClass() {
-        return schoolClass;
-    }
+//    public SchoolClass getSchoolClass() {
+//        return schoolClass;
+//    }
+//
+//    public void setSchoolClass(SchoolClass schoolClass) {
+//        this.schoolClass = schoolClass;
+//    }
 
-    public void setSchoolClass(SchoolClass schoolClass) {
-        this.schoolClass = schoolClass;
-    }
-
-    public List<Grade> getGrades() {
-        return grades;
-    }
-
-    public void setGrades(List<Grade> grades) {
-        this.grades = grades;
-    }
+//    public List<Grade> getGrades() {
+//        return grades;
+//    }
+//
+//    public void setGrades(List<Grade> grades) {
+//        this.grades = grades;
+//    }
 
     //    public void showStudentGradesForTheGivenSubject(Subject subject){
 //        List <Grade> gradeList = this.gradeBook.get(subject);

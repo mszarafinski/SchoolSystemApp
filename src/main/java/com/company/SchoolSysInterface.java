@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
+//@Component
 public class SchoolSysInterface {
 
-    @Bean
+//    @Bean
     CommandLineRunner commandLineRunner(SchoolClassService schoolClassService, StudentService studentService) {
         return args -> {
             School school = new School("COPERNICUS PRIMARY SCHOOL");

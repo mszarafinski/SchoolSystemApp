@@ -50,10 +50,12 @@ public class StudentService {
                         student -> {
                             String firstName = student.getFirstName();
                             String lastName = student.getLastName();
-                            String className = student.getSchoolClass().getClassName();
+//                            String className = student.getSchoolClass().getClassName();
                             Long id = student.getId();
                             System.out.println(
-                                    firstName + " " + lastName + " (class: " + className + ", id: " + id + " )"
+                                    firstName + " " + lastName + " (class: " +
+//                                            className +
+                                            ", id: " + id + " )"
                                     );
                         }
                 );
@@ -74,8 +76,8 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
-    public void changeStudentClass(Student student, SchoolClass newClass){
-        student.setSchoolClass(newClass);
-    }
+//    public void changeStudentClass(Student student, SchoolClass newClass){
+//        student.setSchoolClass(newClass);
+//    }
 
 }

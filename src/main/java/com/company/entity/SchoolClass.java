@@ -41,9 +41,9 @@ public class SchoolClass {
     )
     private String className;
 
-    //    @JsonIgnore
-    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER)
-    private List<Student> students = new ArrayList<>();
+//    //    @JsonIgnore
+//    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER)
+//    private List<Student> students = new ArrayList<>();
 
     public SchoolClass() {
     }
@@ -68,27 +68,27 @@ public class SchoolClass {
         this.className = className;
     }
 
-    public List<Student> getStudents() {
-        return students;
-    }
+//    public List<Student> getStudents() {
+//        return students;
+//    }
+//
+//    public void setStudents(List<Student> students) {
+//        this.students = students;
+//    }
 
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
-
-    public void addStudent(Student student) {
-        if (!this.students.contains(student)) {
-            this.students.add(student);
-            student.setSchoolClass(this);
-        }
-    }
-
-    public void deleteStudent(Student student) {
-        if (this.students.contains(student)) {
-            student.setSchoolClass(null);
-            this.students.remove(student);
-        }
-    }
+//    public void addStudent(Student student) {
+//        if (!this.students.contains(student)) {
+//            this.students.add(student);
+//            student.setSchoolClass(this);
+//        }
+//    }
+//
+//    public void deleteStudent(Student student) {
+//        if (this.students.contains(student)) {
+//            student.setSchoolClass(null);
+//            this.students.remove(student);
+//        }
+//    }
 
     @Override
     public String toString() {
