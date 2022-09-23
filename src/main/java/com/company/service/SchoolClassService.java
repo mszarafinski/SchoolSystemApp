@@ -25,6 +25,8 @@ public class SchoolClassService {
     }
 
     public void createNewClass(SchoolClass schoolClass) {
+
+        schoolClass.setStudentsNumber(0);
         this.schoolClassRepository.save(schoolClass);
     }
 

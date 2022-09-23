@@ -1,5 +1,7 @@
 package com.company.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 import java.util.List;
@@ -39,13 +41,14 @@ public class Student {
     )
     private String lastName;
 
-    @ManyToOne
+    @ManyToOne(4444443)
     @JoinColumn(
             name = "class_id",
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "student_class_name_fk"),
             nullable = true
     )
+//    @JsonIgnore
     private SchoolClass schoolClass;
 
 //    @OneToMany(
@@ -95,7 +98,8 @@ public class Student {
         this.schoolClass = schoolClass;
     }
 
-//    public List<Grade> getGrades() {
+
+    //    public List<Grade> getGrades() {
 //        return grades;
 //    }
 //
