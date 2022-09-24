@@ -1,9 +1,13 @@
 package com.company.controller;
 
+import com.company.entity.Grade;
 import com.company.entity.Student;
+import com.company.service.GradeService;
 import com.company.service.StudentService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -11,9 +15,11 @@ import java.util.List;
 public class StudentController {
 
     private StudentService studentService;
+    private GradeService gradeService;
 
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService, GradeService gradeService) {
         this.studentService = studentService;
+        this.gradeService = gradeService;
     }
 
     @GetMapping(path = "/all")
@@ -44,6 +50,10 @@ public class StudentController {
         studentService.deleteStudentById(id);
 
     }
+
+
+
+
 
 
 

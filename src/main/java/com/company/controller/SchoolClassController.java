@@ -1,7 +1,6 @@
 package com.company.controller;
 
 import com.company.entity.SchoolClass;
-import com.company.entity.Student;
 import com.company.service.SchoolClassService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class SchoolClassController {
 
     @PostMapping
     public void createNewClass(@RequestBody SchoolClass schoolClass){
-        schoolClassService.createNewClass(schoolClass);
+        schoolClassService.saveClass(schoolClass);
     }
 
 }

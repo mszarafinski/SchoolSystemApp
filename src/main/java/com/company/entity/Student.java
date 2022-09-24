@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -41,22 +44,36 @@ public class Student {
     )
     private String lastName;
 
-    @ManyToOne(4444443)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
             name = "class_id",
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "student_class_name_fk"),
             nullable = true
     )
-//    @JsonIgnore
     private SchoolClass schoolClass;
 
-//    @OneToMany(
-//            mappedBy = "student",
-//            fetch = FetchType.EAGER,
-//            orphanRemoval = true,
-//            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-//    private List<Grade> grades;
+    @JsonIgnore
+    @OneToMany(
+            mappedBy = "student",
+            fetch = FetchType.EAGER,
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    private List<Grade> grades = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "students_subjects",
+            joinColumns = @JoinColumn(
+                    name = "student_id", referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "subject_id", referencedColumnName = "id"
+            )
+    )
+    private Set<Subject> subjects = new HashSet<>();
 
     public Student() {
     }
@@ -64,6 +81,12 @@ public class Student {
     public Student(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public Student(String firstName, String lastName, SchoolClass schoolClass) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.schoolClass = schoolClass;
     }
 
     public Long getId() {
@@ -98,14 +121,39 @@ public class Student {
         this.schoolClass = schoolClass;
     }
 
+    public List<Grade> getGrades() {
+        return grades;
+    }
 
-    //    public List<Grade> getGrades() {
-//        return grades;
-//    }
-//
-//    public void setGrades(List<Grade> grades) {
-//        this.grades = grades;
-//    }
+    public void setGrades(List<Grade> grades) {
+        this.grades = grades;
+    }
+
+    public Set<Subject> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(Set<Subject> subjects) {
+        this.subjects = subjects;
+    }
+
+    public void addStudentToClass(SchoolClass schoolClass){
+        this.schoolClass = schoolClass;
+        schoolClass.getStudents().add(this);
+    }
+
+    public void removeStudentFromClass(SchoolClass schoolClass){
+        this.schoolClass = null;
+        schoolClass.getStudents().remove(this);
+    }
+
+    public void addSubjectToStudent(Subject subject){
+        this.subjects.add(subject);
+        subject.getStudents().add(this);
+    }
+
+
+
 
     //    public void showStudentGradesForTheGivenSubject(Subject subject){
 //        List <Grade> gradeList = this.gradeBook.get(subject);

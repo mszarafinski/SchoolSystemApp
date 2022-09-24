@@ -1,14 +1,12 @@
 package com.company.service;
 
 import com.company.entity.SchoolClass;
-import com.company.entity.Student;
 import com.company.repository.SchoolClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 @Service
 public class SchoolClassService {
@@ -24,10 +22,12 @@ public class SchoolClassService {
         return schoolClassRepository.findAll();
     }
 
-    public void createNewClass(SchoolClass schoolClass) {
+    public void saveClass(SchoolClass schoolClass) {
+        schoolClassRepository.save(schoolClass);
+    }
 
-        schoolClass.setStudentsNumber(0);
-        this.schoolClassRepository.save(schoolClass);
+    public void createNewClass(SchoolClass schoolClass){
+        schoolClassRepository.save(schoolClass);
     }
 
     public SchoolClass findById(Long id) {
@@ -35,7 +35,7 @@ public class SchoolClassService {
 
         if (classOptional.isPresent()) {
             return classOptional.get();
-        }else {
+        } else {
             throw new NullPointerException("Class does not exist");
         }
     }

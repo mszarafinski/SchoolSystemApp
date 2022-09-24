@@ -45,17 +45,11 @@ public class SchoolClass {
     @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER)
     private List<Student> students = new ArrayList<>();
 
-    @Column(
-            name = "students_number",
-            nullable = false
-    )
-    private Integer studentsNumber;
-
     public SchoolClass() {
     }
 
     public SchoolClass(String className) {
-        this.className = className.toUpperCase(Locale.ENGLISH);
+        this.className = className.toUpperCase();
     }
 
     public Long getId() {
@@ -82,13 +76,7 @@ public class SchoolClass {
         this.students = students;
     }
 
-    public Integer getStudentsNumber() {
-        return studentsNumber = this.students.size();
-    }
 
-    public void setStudentsNumber(Integer studentsNumber) {
-        this.studentsNumber = studentsNumber;
-    }
 
     //    public void addStudent(Student student) {
 //        if (!this.students.contains(student)) {

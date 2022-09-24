@@ -2,13 +2,13 @@ package com.company;
 
 public enum SubjectName {
 
-    MATHEMATICS("Math"),
-    BIOLOGY("Bio"),
-    CHEMISTRY("Chem"),
-    PHYSICS ("Phys"),
-    ART("Art"),
-    GEOGRAPHY ("Geo"),
-    LITERACY("Literature");
+    MATHEMATICS("MATH"),
+    BIOLOGY("BIO"),
+    CHEMISTRY("CHEM"),
+    PHYSICS ("PHYS"),
+    ART("ART"),
+    GEOGRAPHY ("GEO"),
+    LITERACY("LIT");
 
     private final String name;
 

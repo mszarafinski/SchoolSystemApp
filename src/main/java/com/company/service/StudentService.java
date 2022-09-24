@@ -2,10 +2,12 @@ package com.company.service;
 
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
+import com.company.entity.Subject;
 import com.company.repository.StudentRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +17,12 @@ public class StudentService {
 
     private StudentRepository studentRepository;
     private SchoolClassService schoolClassService;
+    private SubjectService subjectService;
 
-    public StudentService(StudentRepository studentRepository, SchoolClassService schoolClassService) {
+    public StudentService(StudentRepository studentRepository, SchoolClassService schoolClassService, SubjectService subjectService) {
         this.studentRepository = studentRepository;
         this.schoolClassService = schoolClassService;
+        this.subjectService = subjectService;
     }
 
     public boolean checkIfStudentExistsByName(String firstName, String lastName) {
@@ -30,16 +34,20 @@ public class StudentService {
     }
 
     public void addNewStudent(Student student) {
-
-
-
+        addSubjectsToStudent(student);
         studentRepository.save(student);
     }
 
+    public void saveStudent(Student student) {
+        studentRepository.save(student);
+    }
+
+
+    @Transactional
     public void addNewStudent(Student student, Long classId) {
         SchoolClass schoolClass = schoolClassService.findById(classId);
-        student.setSchoolClass(schoolClass);
-        schoolClass.getStudents().add(student);
+        student.addStudentToClass(schoolClass);
+        addSubjectsToStudent(student);
         studentRepository.save(student);
     }
 
@@ -47,12 +55,11 @@ public class StudentService {
         SchoolClass newSchoolClass = schoolClassService.findById(classId);
         Student student = findById(studentId);
 
-        if(!(student.getSchoolClass() == null)) {
+        if (!(student.getSchoolClass() == null)) {
             if (student.getSchoolClass().getId().equals(classId)) {
                 throw new IllegalArgumentException("The student is already assigned to the " + newSchoolClass.getClassName() + " class");
             }
         }
-
         student.setSchoolClass(newSchoolClass);
 
         studentRepository.save(student);
@@ -63,15 +70,22 @@ public class StudentService {
 
         if (studentOptional.isPresent()) {
             return studentOptional.get();
-        }else {
+        } else {
             throw new NullPointerException("Student does not exist");
         }
     }
 
-    public void deleteStudentById(Long studentId){
+    public void deleteStudentById(Long studentId) {
         studentRepository.deleteById(studentId);
     }
 
+    public void addSubjectsToStudent(Student student) {
+        List<Subject> subjects = subjectService.findAll();
+
+        for (Subject subject : subjects) {
+            student.addSubjectToStudent(subject);
+        }
+    }
 
     public boolean checkIfStudentExistsById(Long id) {
         return studentRepository.existsById(id);
@@ -107,10 +121,6 @@ public class StudentService {
 
     }
 
-    public Optional<Student> findStudentById(Long studentId) {
-        return studentRepository.findById(studentId);
-
-    }
 
     @Modifying
     public void deleteStudentById(Student student) {
@@ -118,15 +128,9 @@ public class StudentService {
     }
 
 
-    public Student findbyLastName(String lastName){
+    public Student findbyLastName(String lastName) {
         return studentRepository.findByLastName(lastName);
     }
-
-
-
-
-
-
 
 
 //    public void changeStudentClass(Student student, SchoolClass newClass){
