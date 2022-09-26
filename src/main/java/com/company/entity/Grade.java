@@ -45,7 +45,7 @@ public class Grade {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate date;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(
             name = "subject_id",
             referencedColumnName = "id",
@@ -53,7 +53,7 @@ public class Grade {
     )
     private Subject subject;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(
             name = "student_id",
             referencedColumnName = "id",
@@ -123,4 +123,6 @@ public class Grade {
         subject.getGrades().add(this);
 
     }
+
+
 }

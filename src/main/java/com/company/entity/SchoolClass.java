@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -42,8 +43,8 @@ public class SchoolClass {
     private String className;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER)
-    private List<Student> students = new ArrayList<>();
+    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private Set<Student> students = new HashSet<>();
 
     public SchoolClass() {
     }
@@ -68,29 +69,17 @@ public class SchoolClass {
         this.className = className.toUpperCase();
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students;
     }
 
 
 
-    //    public void addStudent(Student student) {
-//        if (!this.students.contains(student)) {
-//            this.students.add(student);
-//            student.setSchoolClass(this);
-//        }
-//    }
-//
-//    public void deleteStudent(Student student) {
-//        if (this.students.contains(student)) {
-//            student.setSchoolClass(null);
-//            this.students.remove(student);
-//        }
-//    }
+
 
     @Override
     public String toString() {

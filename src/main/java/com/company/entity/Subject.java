@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity(name = "Subject")
 @Table(name = "subjects")
@@ -36,14 +37,22 @@ public class Subject {
     @JsonIgnore
     @OneToMany(
             mappedBy = "subject",
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.REMOVE
+            fetch = FetchType.EAGER
     )
-    private List<Grade> grades = new ArrayList<>();
+    private Set<Grade> grades = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "subjects",cascade = CascadeType.ALL)
-    private List<Student> students = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "students_subjects",
+            joinColumns = @JoinColumn(
+                    name = "student_id", referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "subject_id", referencedColumnName = "id"
+            )
+    )
+    private Set<Student> students = new HashSet<>();
 
 
     public Subject() {
@@ -69,19 +78,19 @@ public class Subject {
         this.id = id;
     }
 
-    public List<Grade> getGrades() {
+    public Set<Grade> getGrades() {
         return grades;
     }
 
-    public void setGrades(List<Grade> grades) {
+    public void setGrades(Set<Grade> grades) {
         this.grades = grades;
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students;
     }
 }

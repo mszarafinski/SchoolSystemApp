@@ -1,5 +1,6 @@
 package com.company.service;
 
+import com.company.TotalAveragesStudentComparator;
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
 import com.company.entity.Subject;
@@ -9,8 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StudentService {
@@ -43,7 +43,7 @@ public class StudentService {
     }
 
 
-    @Transactional
+
     public void addNewStudent(Student student, Long classId) {
         SchoolClass schoolClass = schoolClassService.findById(classId);
         student.addStudentToClass(schoolClass);
@@ -51,6 +51,7 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+    @Transactional
     public void changeStudentClass(Long studentId, Long classId) {
         SchoolClass newSchoolClass = schoolClassService.findById(classId);
         Student student = findById(studentId);
@@ -65,6 +66,7 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+
     public Student findById(Long studentId) {
         Optional<Student> studentOptional = studentRepository.findById(studentId);
 
@@ -75,7 +77,14 @@ public class StudentService {
         }
     }
 
+    @Transactional
+//    @Modifying
     public void deleteStudentById(Long studentId) {
+
+        Student student = findById(studentId);
+
+        student.removeStudentFromSubjects();
+        student.removeStudentFromClass();
         studentRepository.deleteById(studentId);
     }
 
@@ -86,6 +95,45 @@ public class StudentService {
             student.addSubjectToStudent(subject);
         }
     }
+
+    @Transactional
+    public Map<String, Double> getStudentAveragesForAllSubjects(Long studentId){
+        Student student = findById(studentId);
+        return student.calculateAveragesForAllSubjects();
+    }
+
+    public Map<Long,Double> getAllStudentsTotalAverages(){
+        List<Student> students = studentRepository.findAll().stream()
+                .sorted(new TotalAveragesStudentComparator())
+                .toList();
+
+        Map <Long, Double> totalAverages = new HashMap<>();
+
+        for (Student student : students) {
+            Long id = student.getId();
+//            Double totalAverage = student.calculateStudentTotalAverage();
+            Double totalAverage = student.getTotalAverage();
+
+            totalAverages.put(id,totalAverage);
+        }
+
+        return totalAverages;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public boolean checkIfStudentExistsById(Long id) {
         return studentRepository.existsById(id);
@@ -131,6 +179,8 @@ public class StudentService {
     public Student findbyLastName(String lastName) {
         return studentRepository.findByLastName(lastName);
     }
+
+
 
 
 //    public void changeStudentClass(Student student, SchoolClass newClass){

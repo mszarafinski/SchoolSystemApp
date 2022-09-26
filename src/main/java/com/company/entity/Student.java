@@ -1,13 +1,12 @@
 package com.company.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -44,7 +43,7 @@ public class Student {
     )
     private String lastName;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(
             name = "class_id",
             referencedColumnName = "id",
@@ -53,6 +52,15 @@ public class Student {
     )
     private SchoolClass schoolClass;
 
+    @Column(
+            name = "total_average",
+            nullable = true,
+            scale = 2,
+            precision = 2,
+            columnDefinition = "Decimal(3,2)"
+    )
+    private Double totalAverage;
+
     @JsonIgnore
     @OneToMany(
             mappedBy = "student",
@@ -60,19 +68,19 @@ public class Student {
             orphanRemoval = true,
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
     )
-    private List<Grade> grades = new ArrayList<>();
+    private Set<Grade> grades = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(
-            name = "students_subjects",
-            joinColumns = @JoinColumn(
-                    name = "student_id", referencedColumnName = "id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "subject_id", referencedColumnName = "id"
-            )
-    )
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "students", cascade = {CascadeType.PERSIST})
+//    @JoinTable(
+//            name = "students_subjects",
+//            joinColumns = @JoinColumn(
+//                    name = "student_id", referencedColumnName = "id"
+//            ),
+//            inverseJoinColumns = @JoinColumn(
+//                    name = "subject_id", referencedColumnName = "id"
+//            )
+//    )
     private Set<Subject> subjects = new HashSet<>();
 
     public Student() {
@@ -121,11 +129,11 @@ public class Student {
         this.schoolClass = schoolClass;
     }
 
-    public List<Grade> getGrades() {
+    public Set<Grade> getGrades() {
         return grades;
     }
 
-    public void setGrades(List<Grade> grades) {
+    public void setGrades(Set<Grade> grades) {
         this.grades = grades;
     }
 
@@ -137,22 +145,83 @@ public class Student {
         this.subjects = subjects;
     }
 
-    public void addStudentToClass(SchoolClass schoolClass){
+    public Double getTotalAverage() {
+        return totalAverage;
+    }
+
+    public void addStudentToClass(SchoolClass schoolClass) {
         this.schoolClass = schoolClass;
         schoolClass.getStudents().add(this);
     }
 
-    public void removeStudentFromClass(SchoolClass schoolClass){
-        this.schoolClass = null;
+    public void removeStudentFromClass() {
         schoolClass.getStudents().remove(this);
+        this.schoolClass = null;
     }
 
-    public void addSubjectToStudent(Subject subject){
+    public void addSubjectToStudent(Subject subject) {
         this.subjects.add(subject);
         subject.getStudents().add(this);
     }
 
+    public void removeStudentFromSubjects(){
+        for (Subject subject : this.subjects) {
+            subject.getStudents().remove(this);
+        }
+        this.getSubjects().clear();
+    }
 
+
+    public Double calculateSubjectAverage(Subject subject) {
+
+//        if(this.grades.isEmpty()){
+//            return 0d;
+//        }
+
+        List<Integer> grades = this.grades.stream()
+                .filter(grade -> grade.getSubject().equals(subject))
+                .map(grade -> grade.getValue())
+                .collect(Collectors.toList());
+
+        double average = grades.stream()
+                .mapToDouble(Integer::intValue)
+                .average()
+                .getAsDouble();
+
+        return average;
+    }
+
+
+    public Map<String,Double> calculateAveragesForAllSubjects(){
+
+        Map<String, Double> averages = new HashMap<>();
+
+        for (Subject subject : this.subjects) {
+
+            String subjectName = subject.getName();
+            Double average = calculateSubjectAverage(subject);
+
+            averages.put(subjectName,average);
+        }
+        return averages;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void calculateStudentTotalAverage (){
+
+        Map<String, Double> averages = calculateAveragesForAllSubjects();
+
+        Double sum= 0d;
+        Set<String> subjectNames = averages.keySet();
+
+        for (String subjectName : subjectNames) {
+
+            Double average = averages.get(subjectName);
+            sum += average;
+        }
+        this.totalAverage = sum/averages.size();
+    }
 
 
     //    public void showStudentGradesForTheGivenSubject(Subject subject){

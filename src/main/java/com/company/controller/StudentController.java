@@ -4,11 +4,13 @@ import com.company.entity.Grade;
 import com.company.entity.Student;
 import com.company.service.GradeService;
 import com.company.service.StudentService;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/students")
@@ -49,6 +51,16 @@ public class StudentController {
     public void deleteStudentById( @PathVariable(name = "studentId") Long id){
         studentService.deleteStudentById(id);
 
+    }
+
+    @GetMapping(path = "/averages")
+    public Map<String,Double> getStudentAveragesForAllSubjects(@RequestParam(value = "studentId") Long studentId){
+       return studentService.getStudentAveragesForAllSubjects(studentId);
+    }
+
+    @GetMapping(path = "/averages/all")
+    public Map<Long,Double> getAllStudentsTotalAverages(){
+        return studentService.getAllStudentsTotalAverages();
     }
 
 
