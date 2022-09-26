@@ -1,10 +1,7 @@
 package com.company.controller;
 
-import com.company.entity.Grade;
 import com.company.entity.Student;
-import com.company.service.GradeService;
 import com.company.service.StudentService;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +14,11 @@ import java.util.Map;
 public class StudentController {
 
     private StudentService studentService;
-    private GradeService gradeService;
 
-    public StudentController(StudentService studentService, GradeService gradeService) {
+
+    public StudentController(StudentService studentService) {
         this.studentService = studentService;
-        this.gradeService = gradeService;
+
     }
 
     @GetMapping(path = "/all")
@@ -53,14 +50,23 @@ public class StudentController {
 
     }
 
-    @GetMapping(path = "/averages")
+    @GetMapping(path = "grades/averages")
     public Map<String,Double> getStudentAveragesForAllSubjects(@RequestParam(value = "studentId") Long studentId){
        return studentService.getStudentAveragesForAllSubjects(studentId);
     }
 
-    @GetMapping(path = "/averages/all")
+    @GetMapping(path = "grades/averages/all")
     public Map<Long,Double> getAllStudentsTotalAverages(){
         return studentService.getAllStudentsTotalAverages();
+    }
+
+    @PostMapping(path = "grades/add")
+    public void addNewGrade(
+            @RequestParam(value = "studentId") Long studentId,
+            @RequestParam(value = "subjectId") Long subjectId,
+            @RequestParam(value = "grade") Integer gradeValue,
+            @RequestParam(value = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        studentService.addNewGradeToStudent(studentId,subjectId,gradeValue, date);
     }
 
 

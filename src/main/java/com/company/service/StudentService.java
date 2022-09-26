@@ -1,6 +1,7 @@
 package com.company.service;
 
 import com.company.TotalAveragesStudentComparator;
+import com.company.entity.Grade;
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
 import com.company.entity.Subject;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -43,12 +45,13 @@ public class StudentService {
     }
 
 
-
+    @Transactional
     public void addNewStudent(Student student, Long classId) {
         SchoolClass schoolClass = schoolClassService.findById(classId);
         student.addStudentToClass(schoolClass);
         addSubjectsToStudent(student);
         studentRepository.save(student);
+        schoolClassService.saveClass(schoolClass);
     }
 
     @Transactional
@@ -78,7 +81,6 @@ public class StudentService {
     }
 
     @Transactional
-//    @Modifying
     public void deleteStudentById(Long studentId) {
 
         Student student = findById(studentId);
@@ -94,6 +96,26 @@ public class StudentService {
         for (Subject subject : subjects) {
             student.addSubjectToStudent(subject);
         }
+    }
+
+    @Transactional
+    public void addNewGradeToStudent(Long studentId, Long subjectId, Integer gradeValue, LocalDate date){
+
+        if(gradeValue>= 1 && gradeValue<=6){
+
+            Student student = findById(studentId);
+            Subject subject = subjectService.findById(subjectId);
+
+            Grade grade = new Grade(student, subject, gradeValue, date);
+
+            grade.addGradeToStudentAndSubject();
+
+            studentRepository.save(student);
+
+        }else {
+            throw new IllegalArgumentException("Grade must be between 1 and 6.");
+        }
+
     }
 
     @Transactional
@@ -123,68 +145,5 @@ public class StudentService {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    public boolean checkIfStudentExistsById(Long id) {
-        return studentRepository.existsById(id);
-    }
-
-    public void updateStudent(Student student) {
-        studentRepository.save(student);
-    }
-
-    public List<Student> getSortedStudentsList() {
-        Sort sort = Sort.by("lastName").ascending();
-
-        return studentRepository
-                .findAll(sort);
-    }
-
-    public void showStudentList(List<Student> students) {
-
-        students.
-                forEach(
-                        student -> {
-                            String firstName = student.getFirstName();
-                            String lastName = student.getLastName();
-//                            String className = student.getSchoolClass().getClassName();
-                            Long id = student.getId();
-                            System.out.println(
-                                    firstName + " " + lastName + " (class: " +
-//                                            className +
-                                            ", id: " + id + " )"
-                            );
-                        }
-                );
-
-    }
-
-
-    @Modifying
-    public void deleteStudentById(Student student) {
-        studentRepository.delete(student);
-    }
-
-
-    public Student findbyLastName(String lastName) {
-        return studentRepository.findByLastName(lastName);
-    }
-
-
-
-
-//    public void changeStudentClass(Student student, SchoolClass newClass){
-//        student.setSchoolClass(newClass);
-//    }
 
 }

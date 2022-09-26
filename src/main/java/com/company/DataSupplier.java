@@ -4,7 +4,6 @@ import com.company.entity.Grade;
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
 import com.company.entity.Subject;
-import com.company.service.GradeService;
 import com.company.service.SchoolClassService;
 import com.company.service.StudentService;
 import com.company.service.SubjectService;
@@ -23,13 +22,12 @@ public class DataSupplier {
     private SubjectService subjectService;
     private SchoolClassService schoolClassService;
     private StudentService studentService;
-    private GradeService gradeService;
 
-    public DataSupplier(SubjectService subjectService, SchoolClassService schoolClassService, StudentService studentService, GradeService gradeService) {
+    public DataSupplier(SubjectService subjectService, SchoolClassService schoolClassService, StudentService studentService) {
         this.subjectService = subjectService;
         this.schoolClassService = schoolClassService;
         this.studentService = studentService;
-        this.gradeService = gradeService;
+
     }
 
 //    @Bean

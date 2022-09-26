@@ -1,10 +1,10 @@
 package com.company.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,12 +66,12 @@ public class Student {
             mappedBy = "student",
             fetch = FetchType.EAGER,
             orphanRemoval = true,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}
     )
     private Set<Grade> grades = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "students", cascade = {CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "students", cascade = {CascadeType.PERSIST, CascadeType.MERGE })
 //    @JoinTable(
 //            name = "students_subjects",
 //            joinColumns = @JoinColumn(
@@ -174,9 +174,9 @@ public class Student {
 
     public Double calculateSubjectAverage(Subject subject) {
 
-//        if(this.grades.isEmpty()){
-//            return 0d;
-//        }
+        if(noGradesForSubject(subject)){
+            return 0d;
+        }
 
         List<Integer> grades = this.grades.stream()
                 .filter(grade -> grade.getSubject().equals(subject))
@@ -190,6 +190,23 @@ public class Student {
 
         return average;
     }
+
+    private boolean noGradesForSubject(Subject subject) {
+
+        Set<Grade> subjectGrades = new HashSet<>();
+
+        for (Grade grade : this.grades) {
+            if(grade.getSubject().equals(subject)){
+                subjectGrades.add(grade);
+            }
+        }
+
+        if(subjectGrades.isEmpty()){
+            return true;
+        }else return false;
+
+    }
+
 
 
     public Map<String,Double> calculateAveragesForAllSubjects(){
@@ -206,8 +223,7 @@ public class Student {
         return averages;
     }
 
-    @PrePersist
-    @PreUpdate
+    @PostLoad
     public void calculateStudentTotalAverage (){
 
         Map<String, Double> averages = calculateAveragesForAllSubjects();
@@ -220,167 +236,10 @@ public class Student {
             Double average = averages.get(subjectName);
             sum += average;
         }
-        this.totalAverage = sum/averages.size();
+
+        this.totalAverage = new BigDecimal(sum/ averages.size()).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() ;
     }
 
-
-    //    public void showStudentGradesForTheGivenSubject(Subject subject){
-//        List <Grade> gradeList = this.gradeBook.get(subject);
-//        if(gradeList.isEmpty()){
-//            System.out.print("\tNo grades yet");
-//        }
-//        System.out.print("\t" + subject + ": ");
-//        for (Grade grade : gradeList) {
-//            System.out.print("\t" + grade + ", ");
-//        }
-//    }
-
-//    public Grade addGrade(Subject subject) {
-//
-//        Grade grade;
-//        LocalDate gradeDate = setGradeDate(sc);
-//        int gradeValue;
-//
-//        do {
-//            System.out.print("\tEnter the grade from 1 to 6: ");
-//            gradeValue = sc.nextInt();
-//            if (gradeValue < 1 || gradeValue > 6) {
-//                System.out.println("\tIncorrect grade value. Enter the number from 1 to 6");
-//            }
-//        }
-//        while (gradeValue < 1 || gradeValue > 6);
-//
-//        grade = new Grade(gradeValue, gradeDate);
-//
-////        this.gradeBook.get(subject).add(grade);
-//
-//        return grade;
-//
-//    }
-
-////    public void showAverageGrade(Subject subject){
-//        List<Grade> grades = this.gradeBook.get(subject);
-//    }
-
-//    public void printSubjects(){
-//
-//        for(Subject i : gradeBook.keySet()){
-//            System.out.println("\t"+i.ordinal()+1 + ": " + i);
-//        }
-//    }
-
-//    public void showStudentGrades(){
-//
-//        for(Map.Entry<Subject,ArrayList> entry : gradeBook.entrySet()){
-//            Subject subject = entry.getKey();
-//            ArrayList<Grade> grades = entry.getValue();
-//
-//            System.out.print("\t"+subject.getName() + ":\t");
-//
-//            for (int i=0; i<grades.size(); i++ ) {
-//                System.out.print( "\t"+ grades.get(i).getGrade());
-//                if( i < grades.size()-1){
-//                    System.out.print(", ");
-//                }
-//            }
-//            System.out.println();
-//        }
-//    }
-
-//    public void showStudentGradesInTimePeriod(LocalDate startingDate, LocalDate endingDate){
-//
-//        for(Map.Entry<Subject,ArrayList> entry : gradeBook.entrySet()){
-//            Subject subject = entry.getKey();
-//            ArrayList<Grade> grades = entry.getValue();
-//
-//            System.out.print(subject.getName() + ":\t");
-//
-//            for (int i=0; i<grades.size(); i++ ) {
-//                if(grades.get(i).getDate().isBefore(startingDate) || grades.get(i).getDate().isAfter(endingDate)){
-//                    continue;
-//                } else {
-//                    System.out.print("\t"+grades.get(i).getGrade() + " (" + grades.get(i).getDate().toString() + ")");
-//                }
-//                if( i < grades.size()-1){
-//                    System.out.print(", ");
-//                }
-//            }
-//            System.out.println();
-//        }
-//    }
-
-////    public void showStudentAverages(){
-////
-////        for(Map.Entry<Subject,ArrayList> entry : gradeBook.entrySet()){
-////            Subject subject = entry.getKey();
-////            ArrayList<Grade> grades = entry.getValue();
-////
-////            System.out.print(subject.getName() + ":\t");
-////
-////            if (grades.isEmpty()){
-////                System.out.println();
-////                continue;
-////            }
-////
-////            double average = getSubjectAverage(grades);
-////            System.out.println(average);
-////        }
-////    }
-//
-//    public double getSubjectAverage(ArrayList<Grade> grades) {
-//        int sum = 0;
-//        for (int i = 0; i < grades.size(); i++) {
-//            sum += grades.get(i).getGrade();
-//        }
-//        return sum / grades.size();
-//    }
-//
-////    public double getTotalAverage(){
-////
-////        int numberOfSubjets = 1;
-////        double totalAverage = 0;
-////
-////        for(Map.Entry<Subject,ArrayList> entry : gradeBook.entrySet()){
-////            ArrayList<Grade> grades = entry.getValue();
-////
-////            if (grades.isEmpty()){
-////                continue;
-////            }
-////
-////            double average = getSubjectAverage(grades);
-////            totalAverage += average;
-////
-////            numberOfSubjets++;
-////        }
-////        return totalAverage/numberOfSubjets;
-////    }
-//
-//    public static LocalDate setGradeDate(Scanner sc) {
-//        int year;
-//        Month month;
-//        int day = 0;
-//
-//        sc.useDelimiter("/|\\n");
-//
-//        while (true) {
-//            System.out.print("<INPUT> Enter the date in yyyy/MM/dd format >> ");
-//            year = sc.nextInt();
-//            try {
-//                month = Month.of(sc.nextInt());
-//            } catch (DateTimeException dateTimeException) {
-//                sc.nextLine();
-//                System.out.printf("<ERROR> Invalid month input. Month number cannot be less than 1 or greater than 12. Try again\n");
-//                continue;
-//            }
-//            day = sc.nextInt();
-//            if (day > month.maxLength() || day < 1) {
-//                System.out.printf("<ERROR> Invalid day input. Day number cannot be less than 1 or greater than max length of %s (%d). Try again\n", month.toString().toLowerCase(), month.maxLength());
-//                continue;
-//            }
-//            break;
-//        }
-//        return LocalDate.of(year, month, day);
-//    }
 
 
 }

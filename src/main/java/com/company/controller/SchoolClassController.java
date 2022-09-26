@@ -26,4 +26,6 @@ public class SchoolClassController {
         schoolClassService.saveClass(schoolClass);
     }
 
+
+
 }
