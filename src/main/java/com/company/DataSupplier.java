@@ -104,7 +104,7 @@ public class DataSupplier {
 
             for (Subject subject : studentSubjects) {
 
-                int numberOfGradesToBeAdded = 2;
+                int numberOfGradesToBeAdded = 6;
 
                 for (int i = 0; i < numberOfGradesToBeAdded; i++) {
                     int gradeValue = rnd.nextInt(1, 7);

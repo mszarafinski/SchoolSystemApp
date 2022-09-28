@@ -1,5 +1,8 @@
 package com.company.controller;
 
+import com.company.dto.StudentRequest;
+import com.company.dto.StudentResponse;
+import com.company.entity.Grade;
 import com.company.entity.Student;
 import com.company.service.StudentService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/students")
@@ -18,17 +22,16 @@ public class StudentController {
 
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
-
     }
 
     @GetMapping(path = "/all")
-    public List<Student> getAllStudents(){
+    public List<StudentResponse> getAllStudents(){
         return studentService.getAllStudents();
     }
 
     @PostMapping(path = "/add")
-    public void addNewStudent(@RequestBody Student student){
-        studentService.addNewStudent(student);
+    public StudentResponse addNewStudent(@RequestBody StudentRequest student){
+        return studentService.addNewStudent(student);
     }
 
     @PostMapping(path = "/add", params = "classId")
@@ -45,8 +48,8 @@ public class StudentController {
     }
 
     @DeleteMapping(path = "/delete/{studentId}")
-    public void deleteStudentById( @PathVariable(name = "studentId") Long id){
-        studentService.deleteStudentById(id);
+    public StudentResponse deleteStudentById( @PathVariable(name = "studentId") Long id){
+        return studentService.deleteStudentById(id);
 
     }
 
@@ -67,6 +70,16 @@ public class StudentController {
             @RequestParam(value = "grade") Integer gradeValue,
             @RequestParam(value = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         studentService.addNewGradeToStudent(studentId,subjectId,gradeValue, date);
+    }
+
+    @GetMapping(path="grades/between/{studentId}")
+    public Set<Grade> getStudentGradesBetweenDates(
+            @PathVariable(name="studentId") Long studentId,
+            @RequestParam(value = "subjectId")  Long subjectId,
+            @RequestParam (value = "fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam (value = "toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+    ){
+        return studentService.getStudentGradesBetweenDates(studentId, subjectId, fromDate,toDate);
     }
 
 

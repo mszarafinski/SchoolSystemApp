@@ -1,6 +1,8 @@
 package com.company.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import javax.persistence.*;
 
@@ -12,6 +14,8 @@ import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "Student")
 @Table(name = "students")
+@Builder
+@AllArgsConstructor
 public class Student {
 
     @Id
