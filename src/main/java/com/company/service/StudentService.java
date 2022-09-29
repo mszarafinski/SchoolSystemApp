@@ -1,14 +1,17 @@
 package com.company.service;
 
+import com.company.GradeMapper;
 import com.company.LocalDateComparator;
 import com.company.StudentMapper;
 import com.company.TotalAveragesStudentComparator;
+import com.company.dto.GradeResponse;
 import com.company.dto.StudentRequest;
 import com.company.dto.StudentResponse;
 import com.company.entity.Grade;
 import com.company.entity.SchoolClass;
 import com.company.entity.Student;
 import com.company.entity.Subject;
+import com.company.repository.GradeRepository;
 import com.company.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +26,23 @@ public class StudentService {
     private StudentRepository studentRepository;
     private SchoolClassService schoolClassService;
     private SubjectService subjectService;
-    private StudentMapper mapper;
+    private StudentMapper studentMapper;
+    private GradeMapper gradeMapper;
 
-    public StudentService(StudentRepository studentRepository, SchoolClassService schoolClassService, SubjectService subjectService, StudentMapper mapper) {
+
+    public StudentService(
+            StudentRepository studentRepository,
+            SchoolClassService schoolClassService,
+            SubjectService subjectService,
+            StudentMapper mapper,
+            GradeMapper gradeMapper
+    ) {
         this.studentRepository = studentRepository;
         this.schoolClassService = schoolClassService;
         this.subjectService = subjectService;
-        this.mapper = mapper;
+        this.studentMapper = mapper;
+        this.gradeMapper = gradeMapper;
+
     }
 
     public boolean checkIfStudentExistsByName(String firstName, String lastName) {
@@ -40,28 +53,10 @@ public class StudentService {
         List<Student> students = studentRepository.findAll();
 
         return students.stream()
-                .map(student -> mapper.mapEntityToResponse(student))
+                .map(student -> studentMapper.mapEntityToResponse(student))
                 .collect(Collectors.toList());
     }
 
-    public StudentResponse addNewStudent(StudentRequest studentRequest) {
-
-        Student student = Student.builder()
-                .firstName(studentRequest.getFirstName())
-                .lastName(studentRequest.getLastName())
-                .grades(new HashSet<Grade>())
-                .subjects(new HashSet<Subject>())
-                .build();
-
-        addSubjectsToStudent(student);
-        studentRepository.save(student);
-
-        return StudentResponse.builder()
-                .firstName(student.getFirstName())
-                .lastName(student.getLastName())
-                .id(student.getId())
-                .build();
-    }
 
     public void saveStudent(Student student) {
         studentRepository.save(student);
@@ -69,16 +64,21 @@ public class StudentService {
 
 
     @Transactional
-    public void addNewStudent(Student student, Long classId) {
-        SchoolClass schoolClass = schoolClassService.findById(classId);
+    public StudentResponse addNewStudent(StudentRequest studentRequest) {
+
+        SchoolClass schoolClass = schoolClassService.findById(studentRequest.getClassId());
+
+        Student student = studentMapper.mapRequestToEntity(studentRequest);
+
         student.addStudentToClass(schoolClass);
         addSubjectsToStudent(student);
-        studentRepository.save(student);
         schoolClassService.saveClass(schoolClass);
+
+        return studentMapper.mapEntityToResponse(student);
     }
 
     @Transactional
-    public void changeStudentClass(Long studentId, Long classId) {
+    public StudentResponse changeStudentClass(Long studentId, Long classId) {
         SchoolClass newSchoolClass = schoolClassService.findById(classId);
         Student student = findById(studentId);
 
@@ -88,8 +88,9 @@ public class StudentService {
             }
         }
         student.setSchoolClass(newSchoolClass);
-
         studentRepository.save(student);
+
+        return studentMapper.mapEntityToResponse(student);
     }
 
 
@@ -128,7 +129,7 @@ public class StudentService {
     }
 
     @Transactional
-    public void addNewGradeToStudent(Long studentId, Long subjectId, Integer gradeValue, LocalDate date) {
+    public GradeResponse addNewGradeToStudent(Long studentId, Long subjectId, Integer gradeValue, LocalDate date) {
 
         if (gradeValue >= 1 && gradeValue <= 6) {
 
@@ -136,10 +137,11 @@ public class StudentService {
             Subject subject = subjectService.findById(subjectId);
 
             Grade grade = new Grade(student, subject, gradeValue, date);
-
             grade.addGradeToStudentAndSubject();
 
             studentRepository.save(student);
+
+            return gradeMapper.mapEntityToResponse(grade);
 
         } else {
             throw new IllegalArgumentException("Grade must be between 1 and 6.");
@@ -172,17 +174,18 @@ public class StudentService {
     }
 
     @Transactional
-    public Set<Grade> getStudentGradesBetweenDates(Long studentId, Long subjectId, LocalDate fromDate, LocalDate toDate) {
+    public List<GradeResponse> getStudentGradesBetweenDates(Long studentId, Long subjectId, LocalDate fromDate, LocalDate toDate) {
 
 
         Student student = findById(studentId);
-        Subject subject = subjectService.findById(studentId);
+        Subject subject = subjectService.findById(subjectId);
 
-        Set<Grade> gradesBetween = student.getGrades().stream()
+        List<GradeResponse> gradesBetween = student.getGrades().stream()
                 .filter(grade -> grade.getSubject().equals(subject))
                 .filter(grade -> grade.getDate().isAfter(fromDate) && grade.getDate().isBefore(toDate))
                 .sorted(new LocalDateComparator())
-                .collect(Collectors.toSet());
+                .map(grade -> gradeMapper.mapEntityToResponse(grade))
+                .collect(Collectors.toList());
 
         return gradesBetween;
 

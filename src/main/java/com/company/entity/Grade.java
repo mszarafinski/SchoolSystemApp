@@ -2,6 +2,8 @@ package com.company.entity;
 
 import com.company.SubjectName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.util.Scanner;
 
 @Entity(name = "Grade")
 @Table(name = "grades")
+@AllArgsConstructor
+@Builder
 public class Grade {
 
     @Id
